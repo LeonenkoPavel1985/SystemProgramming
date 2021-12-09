@@ -25,9 +25,9 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCMDLine, in
 	//wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	//wc.hIconSm = LoadIcon(hInstance, MAKEINTRESOURCE (IDI_ICON1));// Small icon
 	wc.hIcon = (HICON)LoadImage(NULL, "Network.ico", IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE),
-	wc.hIconSm = (HICON)LoadImage(NULL, "Save.ico", IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE),
-	
-	wc.hCursor = LoadCursor(hInstance, IDC_ARROW); 
+		wc.hIconSm = (HICON)LoadImage(NULL, "Save.ico", IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE),
+
+		wc.hCursor = LoadCursor(hInstance, IDC_ARROW);
 	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	wc.lpszClassName = G_SZ_CLASS_NAME;
 	wc.lpszMenuName = NULL;
@@ -52,8 +52,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCMDLine, in
 		G_SZ_CLASS_NAME, // Имя класса окна.
 		G_SZ_CLASS_NAME, // Заголовок окна.
 		WS_OVERLAPPEDWINDOW, // Стиль окна WS_OVERLAPPEDWINDOW - это главное окно приложения.
-		screen_width / 8, screen_height /8, // 100, 100, // Начальная позиция, эти пиксели определяют положение верхнего левого угла.
-		window_width,window_height, // Размер окна в пикселях.
+		screen_width / 8, screen_height / 8, // 100, 100, // Начальная позиция, эти пиксели определяют положение верхнего левого угла.
+		window_width, window_height, // Размер окна в пикселях.
 		NULL, //Родительское окно
 		NULL, //Menu
 		hInstance,
