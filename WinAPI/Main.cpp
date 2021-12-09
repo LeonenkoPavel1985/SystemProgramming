@@ -26,10 +26,12 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCMDLine, in
 	//wc.hIconSm = LoadIcon(hInstance, MAKEINTRESOURCE (IDI_ICON1));// Small icon
 	wc.hIcon = (HICON)LoadImage(NULL, "Network.ico", IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE),
 	wc.hIconSm = (HICON)LoadImage(NULL, "Save.ico", IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE),
-	wc.hCursor = LoadCursor(hInstance, IDC_ARROW);
+	
+	wc.hCursor = LoadCursor(hInstance, IDC_ARROW); 
 	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	wc.lpszClassName = G_SZ_CLASS_NAME;
 	wc.lpszMenuName = NULL;
+
 
 	if (!RegisterClassEx(&wc))
 	{
