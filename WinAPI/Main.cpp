@@ -3,6 +3,9 @@
 
 CONST CHAR G_SZ_CLASS_NAME[] = "MyWindowClass"; //Имя класса окна 
 
+WNDCLASSEX WndRegist(HINSTANCE hInstance);
+HWND WndCreate(HINSTANCE hInstance);
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCMDLine, int nCmdShow)
@@ -15,23 +18,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCMDLine, in
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	//1) Регистрация класса окна:
-	WNDCLASSEX wc;
-	wc.cbSize = sizeof(WNDCLASSEX); // cb - count bytes
-	wc.style = 0;
-	wc.lpfnWndProc = WndProc; // lpfn - LongPointer to Function (Указатель на функцию).
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0; // Дополнительная память для класс и для окна.
-	wc.hInstance = hInstance; // Какому *.exe-модулю будет принадлежать окно.
-	//wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
-	//wc.hIconSm = LoadIcon(hInstance, MAKEINTRESOURCE (IDI_ICON1));// Small icon
-	wc.hIcon = (HICON)LoadImage(NULL, "Network.ico", IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE),
-	wc.hIconSm = (HICON)LoadImage(NULL, "Save.ico", IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE),
-	
-	wc.hCursor = LoadCursor(hInstance, IDC_ARROW); 
-	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-	wc.lpszClassName = G_SZ_CLASS_NAME;
-	wc.lpszMenuName = NULL;
-
+	WNDCLASSEX wc = WndRegist(hInstance);
 
 	if (!RegisterClassEx(&wc))
 	{
@@ -40,25 +27,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCMDLine, in
 	}
 
 	//2) Создание окна:
+	HWND hwnd = WndCreate(hInstance);
 
-	int screen_width = GetSystemMetrics(SM_CXSCREEN); // Получаем разрешение экрана шире.
-	int screen_height = GetSystemMetrics(SM_CYSCREEN); // Получаем разрешение экрана шире.
-	int window_width = screen_width - screen_width / 4;
-	int window_height = screen_height - screen_height / 4;
-
-	HWND hwnd = CreateWindowEx // Возвращает HWND созданного окна, усли окно не было создано, функция возвращает NULL.
-	(
-		WS_EX_CLIENTEDGE,
-		G_SZ_CLASS_NAME, // Имя класса окна.
-		G_SZ_CLASS_NAME, // Заголовок окна.
-		WS_OVERLAPPEDWINDOW, // Стиль окна WS_OVERLAPPEDWINDOW - это главное окно приложения.
-		screen_width / 8, screen_height /8, // 100, 100, // Начальная позиция, эти пиксели определяют положение верхнего левого угла.
-		window_width,window_height, // Размер окна в пикселях.
-		NULL, //Родительское окно
-		NULL, //Menu
-		hInstance,
-		NULL
-	);
 	if (hwnd == NULL)
 	{
 		MessageBox(NULL, "Class registration failed!", "Error", MB_OK | MB_ICONERROR);
@@ -75,6 +45,56 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCMDLine, in
 		DispatchMessage(&msg);
 	}
 	return msg.wParam;
+}
+
+WNDCLASSEX WndRegist(HINSTANCE hInstance)
+{
+	//1) Регистрация класса окна:
+	WNDCLASSEX wc;
+	wc.cbSize = sizeof(WNDCLASSEX); // cb - count bytes
+	wc.style = 0;
+	wc.lpfnWndProc = WndProc; // lpfn - LongPointer to Function (Указатель на функцию).
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = 0; // Дополнительная память для класс и для окна.
+	wc.hInstance = hInstance; // Какому *.exe-модулю будет принадлежать окно.
+	//wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
+	//wc.hIconSm = LoadIcon(hInstance, MAKEINTRESOURCE (IDI_ICON1));// Small icon
+	wc.hIcon = (HICON)LoadImage(NULL, "Network.ico", IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE),
+		wc.hIconSm = (HICON)LoadImage(NULL, "Save.ico", IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE),
+
+		//wc.hCursor = LoadCursor(hInstance, IDC_ARROW); //наш стандартный курсор по умолчанию в виде стрелки.
+		//wc.hCursor = LoadCursor(hInstance, IDC_SIZE); // меняем стандартный курсор на курсор в виде четырер стрелок.(не отработывает)
+		//wc.hCursor = LoadCursor(hInstance, IDC_SIZENS); // курсор в виде двойной стрелки. (не отрабатывает.)
+		wc.hCursor = LoadCursorFromFile("SPHandwriting.ani");
+
+	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	wc.lpszClassName = G_SZ_CLASS_NAME;
+	wc.lpszMenuName = NULL;
+
+	return wc;
+}
+
+HWND WndCreate(HINSTANCE hInstance)
+{
+	//Создание окна.
+	int screen_width = GetSystemMetrics(SM_CXSCREEN); // Получаем разрешение экрана шире.
+	int screen_height = GetSystemMetrics(SM_CYSCREEN); // Получаем разрешение экрана шире.
+	int window_width = screen_width - screen_width / 4;
+	int window_height = screen_height - screen_height / 4;
+
+	HWND hwnd = CreateWindowEx // Возвращает HWND созданного окна, усли окно не было создано, функция возвращает NULL.
+	(
+		WS_EX_CLIENTEDGE,
+		G_SZ_CLASS_NAME, // Имя класса окна.
+		G_SZ_CLASS_NAME, // Заголовок окна.
+		WS_OVERLAPPEDWINDOW, // Стиль окна WS_OVERLAPPEDWINDOW - это главное окно приложения.
+		screen_width / 8, screen_height / 8, // 100, 100, // Начальная позиция, эти пиксели определяют положение верхнего левого угла.
+		window_width, window_height, // Размер окна в пикселях.
+		NULL, //Родительское окно
+		NULL, //Menu
+		hInstance,
+		NULL
+	);
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
