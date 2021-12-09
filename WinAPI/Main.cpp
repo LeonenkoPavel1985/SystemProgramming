@@ -60,12 +60,12 @@ WNDCLASSEX WndRegist(HINSTANCE hInstance)
 	//wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	//wc.hIconSm = LoadIcon(hInstance, MAKEINTRESOURCE (IDI_ICON1));// Small icon
 	wc.hIcon = (HICON)LoadImage(NULL, "Network.ico", IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE),
-		wc.hIconSm = (HICON)LoadImage(NULL, "Save.ico", IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE),
+	wc.hIconSm = (HICON)LoadImage(NULL, "Save.ico", IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE),
 
-		//wc.hCursor = LoadCursor(hInstance, IDC_ARROW); //наш стандартный курсор по умолчанию в виде стрелки.
-		//wc.hCursor = LoadCursor(hInstance, IDC_SIZE); // меняем стандартный курсор на курсор в виде четырер стрелок.(не отработывает)
-		//wc.hCursor = LoadCursor(hInstance, IDC_SIZENS); // курсор в виде двойной стрелки. (не отрабатывает.)
-		wc.hCursor = LoadCursorFromFile("SPHandwriting.ani");
+	//wc.hCursor = LoadCursor(hInstance, IDC_ARROW); //наш стандартный курсор по умолчанию в виде стрелки.
+	//wc.hCursor = LoadCursor(hInstance, IDC_SIZE); // меняем стандартный курсор на курсор в виде четырер стрелок.(не отработывает)
+	//wc.hCursor = LoadCursor(hInstance, IDC_SIZENS); // курсор в виде двойной стрелки. (не отрабатывает.)
+	wc.hCursor = LoadCursorFromFile("SPHandwriting.ani");
 
 	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	wc.lpszClassName = G_SZ_CLASS_NAME;
@@ -82,7 +82,7 @@ HWND WndCreate(HINSTANCE hInstance)
 	int window_width = screen_width - screen_width / 4;
 	int window_height = screen_height - screen_height / 4;
 
-	HWND hwnd = CreateWindowEx // Возвращает HWND созданного окна, усли окно не было создано, функция возвращает NULL.
+	return CreateWindowEx // Возвращает HWND созданного окна, усли окно не было создано, функция возвращает NULL.
 	(
 		WS_EX_CLIENTEDGE,
 		G_SZ_CLASS_NAME, // Имя класса окна.
