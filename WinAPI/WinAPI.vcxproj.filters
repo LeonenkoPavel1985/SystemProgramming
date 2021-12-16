@@ -36,5 +36,16 @@
     <Image Include="Save.ico">
       <Filter>Файлы ресурсов</Filter>
     </Image>
+    <Image Include="arrow2.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="cursor.bmp">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="light.cur">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
   </ItemGroup>
 </Project>
