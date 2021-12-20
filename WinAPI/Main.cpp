@@ -1,8 +1,16 @@
 ﻿#include<Windows.h>
+#include<CommCtrl.h> //Подключаем CommondContrils, для того чтобы использовать всплывающую подсказку (ToolTip).
+#include <Windowsx.h> //GET_X_LPARAM
 #include<string>
 #include"resource.h"
 
+#pragma comment(lib, "Comctl32.lib")
+
 CONST CHAR G_SZ_CLASS_NAME[] = "MyWindowClass";	//Имя класса окна
+
+TOOLINFO g_toolItem = { 0 }; // для всплывающей подсказки.
+HWND g_hwndTrackingTT = NULL;
+BOOL g_trackingMouse = FALSE;
 
 //https://docs.microsoft.com/en-us/windows/win32/dataxchg/about-atom-tables
 ATOM RegisterWindowClass(WNDPROC wndProc, HINSTANCE hInstance);
@@ -146,13 +154,129 @@ HWND CreateWnd(HINSTANCE hInstance)
 	);
 	return hwnd;
 }
+
+void CreateToolTipForRect(HWND hwndParent)
+{
+	HWND hwndTT = CreateWindowEx
+	(
+		WS_EX_TOPMOST,// Стиль окна - поверх остальных окон.
+		TOOLTIPS_CLASS, //Класс окна - всплывающая подсказка (ToolTip).
+		NULL,// текст окна пока отсутствует.
+		WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
+		CW_USEDEFAULT, CW_USEDEFAULT, //положение окна.
+		CW_USEDEFAULT, CW_USEDEFAULT,// размер окна.
+		hwndParent,
+		NULL, // Menu - для главного окна, ResourceID для дочернего окна.
+		GetModuleHandle(NULL),// hInstance программы.
+		NULL
+	);
+
+	SetWindowPos(hwndTT, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+
+	TOOLINFO ti = { 0 };
+	ti.cbSize = sizeof(TOOLINFO);
+	ti.uFlags = TTF_SUBCLASS;
+	ti.hwnd = hwndParent;
+	ti.hinst = GetModuleHandle(NULL);
+	ti.lpszText = (LPSTR)"This is a ToolTip";
+
+	GetClientRect(hwndParent, &ti.rect);
+
+	SendMessage(hwndTT, TTM_ADDTOOL, 0, (LPARAM)(LPTOOLINFO)&ti);
+}
+
+HWND CreateTrackingToolTip(int toolID, HWND hwnd, CHAR* pText)
+{
+	HWND hwndTT = CreateWindowEx
+	(
+		WS_EX_TOPMOST,
+		TOOLTIPS_CLASS,
+		NULL,
+		WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
+		CW_USEDEFAULT, CW_USEDEFAULT,
+		CW_USEDEFAULT, CW_USEDEFAULT,
+		hwnd,
+		NULL,
+		GetModuleHandle(NULL),
+		NULL
+	);
+
+	if (hwndTT == NULL)
+	{
+		MessageBox(hwnd, "Tooltip creation failed", "Error", MB_OK | MB_ICONERROR);
+		return 0;
+	}
+
+	g_toolItem.cbSize = sizeof(TOOLINFO);
+	g_toolItem.uFlags = TTF_IDISHWND | TTF_TRACK | TTF_ABSOLUTE;
+	g_toolItem.hwnd = hwnd;
+	g_toolItem.hinst = GetModuleHandle(NULL);
+	g_toolItem.lpszText = pText;
+	g_toolItem.uId = (UINT_PTR)hwnd;
+
+	GetClientRect(hwnd, &g_toolItem.rect);
+
+	SendMessage(hwndTT, TTM_ADDTOOL, 0, (LPARAM)(LPTOOLINFO)&g_toolItem);
+
+	return hwndTT;
+}
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
 	case WM_CREATE:
 		//Создаются и инициализируются элементы окна.
+	{
+		InitCommonControls();
+		g_hwndTrackingTT = CreateTrackingToolTip(IDC_BUTTON1, hwnd, (CHAR*)"");
+		return TRUE;
+	}
 		break;
+	case WM_MOUSELEAVE:
+		SendMessage(g_hwndTrackingTT, TTM_TRACKACTIVATE, (WPARAM)FALSE, (LPARAM)&g_toolItem);
+		g_trackingMouse = FALSE;
+		return FALSE;
+		break;
+	case WM_MOUSEMOVE:
+	{
+		//CreateToolTipForRect(hwnd);
+		static int oldX, oldY;
+		int newX, newY;
+
+		if (g_trackingMouse == NULL)
+		{
+			TRACKMOUSEEVENT tme = { sizeof(TRACKMOUSEEVENT) };
+			tme.hwndTrack = hwnd;
+			tme.dwFlags = TME_LEAVE;
+
+			TrackMouseEvent(&tme);
+
+			SendMessage(g_hwndTrackingTT, TTM_TRACKACTIVATE, (WPARAM)TRUE, (LPARAM)&g_toolItem);
+			g_trackingMouse = TRUE;
+		}
+
+		newX = GET_X_LPARAM(lParam);
+		newY = GET_Y_LPARAM(lParam);
+
+		if (newX != oldX || newY != oldY)
+		{
+			oldX = newX;
+			oldY = newY;
+
+			CHAR coords[20]{};
+			wsprintf(coords, "X = %d Y = %d", newX, newY);
+
+			g_toolItem.lpszText = coords;
+			SendMessage(g_hwndTrackingTT, TTM_SETTOOLINFO, 0, (LPARAM)&g_toolItem);
+
+			POINT pt = { newX,newY };
+			ClientToScreen(hwnd, &pt);
+			SendMessage(g_hwndTrackingTT, TTM_TRACKPOSITION, 0, (LPARAM)MAKELONG(pt.x + 10, pt.y - 20));
+		}
+		return FALSE;
+	}
+	break;
 	case WM_MOVE:
 	case WM_SIZE:
 	{

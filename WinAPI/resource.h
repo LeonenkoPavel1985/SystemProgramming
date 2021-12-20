@@ -8,6 +8,8 @@
 #define IDB_BITMAP1                     108
 #define IDC_CURSOR1                     109
 
+#define IDC_BUTTON1                     105
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
